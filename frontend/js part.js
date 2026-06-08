@@ -35,3 +35,4 @@ function addItemToList(item) {
   const data = await res.json();
   data.forEach(addItemToList);
 })();
+fetch("http://localhost:5000/api/items")
