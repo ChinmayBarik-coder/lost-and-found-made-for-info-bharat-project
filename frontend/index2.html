@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus | Lost & Found</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --bg-color: #0b0f19;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-lost: #ff4757;
+            --accent-found: #2ed573;
+            --primary: #3742fa;
+            --primary-glow: rgba(55, 66, 250, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(55, 66, 250, 0.15), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(255, 71, 87, 0.1), transparent 25%);
+            background-attachment: fixed;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-color); }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+
+        /* Navbar */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 5%;
+            background: rgba(11, 15, 25, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #ffffff, #a5b4fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 1px;
+        }
+
+        .nav-actions button {
+            background: transparent;
+            color: var(--text-main);
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        .nav-actions .btn-post {
+            background: var(--primary);
+            border-radius: 30px;
+            margin-left: 15px;
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        .nav-actions .btn-post:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px var(--primary-glow);
+        }
+
+        /* Hero & Search */
+        header {
+            text-align: center;
+            padding: 60px 20px 40px;
+        }
+
+        header h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .search-container {
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .search-container i {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .search-container input {
+            width: 100%;
+            padding: 18px 20px 18px 50px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            color: white;
+            font-size: 1.1rem;
+            outline: none;
+            backdrop-filter: blur(10px);
+            transition: 0.3s;
+        }
+
+        .search-container input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px var(--primary-glow);
+        }
+
+        /* Filters */
+        .filters {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-muted);
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .filter-btn.active, .filter-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Grid & Cards */
+        .grid-container {
+            padding: 40px 5%;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        .card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            transition: 0.4s;
+            position: relative;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .card-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            backdrop-filter: blur(5px);
+        }
+
+        .badge.lost { background: rgba(255, 71, 87, 0.2); color: var(--accent-lost); border: 1px solid var(--accent-lost); }
+        .badge.found { background: rgba(46, 213, 115, 0.2); color: var(--accent-found); border: 1px solid var(--accent-found); }
+
+        .card h3 { font-size: 1.4rem; margin-bottom: 10px; }
+        .card p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .card .desc { margin-top: 15px; font-size: 0.95rem; color: #cbd5e1; line-height: 1.5; }
+
+        .btn-connect {
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-weight: 600;
+        }
+
+        .btn-connect:hover {
+            background: white;
+            color: var(--bg-color);
+        }
+
+        /* Modal / Form */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal {
+            background: #111827;
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 40px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            transform: translateY(50px);
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .modal-overlay.active .modal { transform: translateY(0); }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .close-btn { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; color: var(--text-muted); font-size: 0.9rem; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            border-radius: 10px;
+            outline: none;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            border-color: var(--primary);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 0 15px var(--primary-glow);
+            transition: 0.3s;
+        }
+
+        .btn-submit:hover { box-shadow: 0 0 25px var(--primary-glow); }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header h1 { font-size: 2rem; }
+            .nav-actions button { display: none; }
+            .nav-actions .btn-post { display: block; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo"><i class="fas fa-radar"></i> Nexus</div>
+        <div class="nav-actions">
+            <button onclick="alert('Login module would open here!')">Sign In</button>
+            <button onclick="alert('Admin panel requires authentication.')">Admin</button>
+            <button class="btn-post" onclick="toggleModal()"><i class="fas fa-plus"></i> Report Item</button>
+        </div>
+    </nav>
+
+    <header>
+        <h1>Find What You Lost. <br> Return What You Found.</h1>
+        <div class="search-container">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Search by item name, category, or location...">
+        </div>
+        
+        <div class="filters">
+            <button class="filter-btn active" data-filter="all">All Items</button>
+            <button class="filter-btn" data-filter="lost">Lost Items</button>
+            <button class="filter-btn" data-filter="found">Found Items</button>
+            <button class="filter-btn" data-filter="electronics">Electronics</button>
+            <button class="filter-btn" data-filter="keys">Keys</button>
+        </div>
+    </header>
+
+    <main class="grid-container" id="itemsGrid">
+        </main>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Report an Item</h2>
+                <button class="close-btn" onclick="toggleModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="itemForm">
+                <div class="form-group">
+                    <label>Report Type</label>
+                    <select id="type" required>
+                        <option value="lost">I lost something</option>
+                        <option value="found">I found something</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Item Name</label>
+                    <input type="text" id="title" placeholder="e.g., MacBook Pro" required>
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="category" required>
+                        <option value="electronics">Electronics</option>
+                        <option value="documents">Documents</option>
+                        <option value="keys">Keys</option>
+                        <option value="pets">Pets</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 15px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label>Location</label>
+                        <input type="text" id="location" placeholder="e.g., Terminal 2" required>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label>Date</label>
+                        <input type="date" id="date" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="desc" rows="3" placeholder="Provide distinct features..." required></textarea>
+                </div>
+                <button type="submit" class="btn-submit">Submit Report</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // High-quality placeholder images via Unsplash Source IDs for aesthetics
+        const mockData = [
+            { id: 1, type: 'lost', title: 'Sony Wireless Headphones', category: 'electronics', location: 'University Library', date: '2023-10-24', desc: 'Black WH-1000XM4. Left them on a desk on the 3rd floor.', img: 'https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?auto=format&fit=crop&w=500&q=80' },
+            { id: 2, type: 'found', title: 'Car Keys with Leather Fob', category: 'keys', location: 'Downtown Coffee Shop', date: '2023-10-25', desc: 'Toyota keys found near the entrance patio.', img: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=500&q=80' },
+            { id: 3, type: 'lost', title: 'Brown Leather Wallet', category: 'documents', location: 'Subway Station', date: '2023-10-26', desc: 'Contains ID and several cards. Reward offered!', img: 'https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=500&q=80' },
+            { id: 4, type: 'found', title: 'Golden Retriever Dog', category: 'pets', location: 'Central Park', date: '2023-10-27', desc: 'Friendly dog, wearing a red collar but no tags.', img: 'https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=500&q=80' },
+        ];
+
+        const grid = document.getElementById('itemsGrid');
+        const searchInput = document.getElementById('searchInput');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        let currentFilter = 'all';
+
+        // Render Cards
+        function renderItems(items) {
+            grid.innerHTML = '';
+            if(items.length === 0) {
+                grid.innerHTML = `<h3 style="grid-column: 1/-1; text-align: center; color: var(--text-muted); margin-top: 50px;">No matching items found.</h3>`;
+                return;
+            }
+
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <img src="${item.img}" class="card-img" alt="${item.title}">
+                    <span class="badge ${item.type}">${item.type}</span>
+                    <div class="card-content">
+                        <h3>${item.title}</h3>
+                        <p><i class="fas fa-map-marker-alt"></i> ${item.location}</p>
+                        <p><i class="far fa-calendar-alt"></i> ${item.date}</p>
+                        <p><i class="fas fa-tag"></i> <span style="text-transform: capitalize;">${item.category}</span></p>
+                        <p class="desc">${item.desc}</p>
+                        <button class="btn-connect" onclick="alert('Secure messaging initiated with the owner/finder!')">
+                            <i class="fas fa-comment-dots"></i> Contact ${item.type === 'lost' ? 'Owner' : 'Finder'}
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Search & Filter Logic
+        function filterData() {
+            const query = searchInput.value.toLowerCase();
+            const filtered = mockData.filter(item => {
+                const matchesSearch = item.title.toLowerCase().includes(query) || 
+                                      item.location.toLowerCase().includes(query) || 
+                                      item.desc.toLowerCase().includes(query);
+                
+                const matchesType = currentFilter === 'all' || 
+                                    item.type === currentFilter || 
+                                    item.category === currentFilter;
+                
+                return matchesSearch && matchesType;
+            });
+            renderItems(filtered);
+        }
+
+        searchInput.addEventListener('input', filterData);
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                currentFilter = e.target.getAttribute('data-filter');
+                filterData();
+            });
+        });
+
+        // Modal Logic
+        const modalOverlay = document.getElementById('modalOverlay');
+        function toggleModal() {
+            modalOverlay.classList.toggle('active');
+        }
+
+        // Form Submission
+        document.getElementById('itemForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const newItem = {
+                id: Date.now(),
+                type: document.getElementById('type').value,
+                title: document.getElementById('title').value,
+                category: document.getElementById('category').value,
+                location: document.getElementById('location').value,
+                date: document.getElementById('date').value,
+                desc: document.getElementById('desc').value,
+                // Assign a generic aesthetic gradient background as image fallback for new posts
+                img: `https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&w=500&q=80` 
+            };
+
+            mockData.unshift(newItem); // Add to top of array
+            filterData(); // Re-render grid
+            toggleModal(); // Close modal
+            this.reset(); // Clear form
+            
+            // Success Toast simulation
+            setTimeout(() => alert('Successfully posted to the community!'), 300);
+        });
+
+        // Initial Render
+        renderItems(mockData);
+    </script>
+</body>
+</html>
