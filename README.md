@@ -1,13 +1,13 @@
-Lost and Found Information System
-The Lost and Found Information System comprises two modules: Public and Management sites.
+<h1>Lost and Found Information System</h1>
+<p>The Lost and Found Information System comprises two modules: Public and Management sites.
 
 Management Site
 Accessible only to system administrators and staff, it requires valid credentials for access. Administrators manage system data, including user lists, categories, items, and system information. Staff members have limited permissions. Additionally, the management site enables dynamic updates to select public site content.
 
 Public Site
 Visitors can explore published unclaimed items, view various page content, and send inquiries or concerns. The posted item list can be filtered by category for easy navigation. This web application simplifies lost and found item management, enhancing user experience and efficiency.
-
-Features and Functionalities
+</p>
+<h3>Features and Functionalities</h3>
 Management
 Login and Logout
 Dashboard
@@ -34,3 +34,9 @@ Messages Management
 List All Messages/Inquiries
 Read Message Details
 Delete Message
+<h3>To run frontend </h3>
+<p><pre>first run the command npm install</pre>
+<pre> then run the commsasnd npm run dev</pre></p>
+<h3>To run Backend </h3>
+<p><pre>first run the command npm install</pre>
+<pre> then run the commsasnd npm start</pre></p>
