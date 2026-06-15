@@ -66,7 +66,7 @@ export default function App() {
     <>
       {/* Navigation */}
       <nav>
-        <div className="logo"><i className="fas fa-radar"></i> Nexus</div>
+        <div className="logo"><i className="fas fa-radar"></i> Lost & Found</div>
         <div className="nav-actions">
           <button onClick={() => alert('Login module would open here!')}>Sign In</button>
           <button onClick={() => alert('Admin panel requires authentication.')}>Admin</button>
