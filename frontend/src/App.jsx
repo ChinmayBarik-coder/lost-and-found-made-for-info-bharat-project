@@ -97,7 +97,7 @@ export default function App() {
     <>
       {/* Navigation */}
       <nav>
-        <div className="logo"><i className="fas fa-radar"></i> Nexus</div>
+        <div className="logo"><i className="fas fa-radar"></i> LOST & FOUND </div>
         <div className="nav-actions">
           
           {/* Dynamic Login/Logout Button */}
