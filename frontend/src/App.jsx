@@ -1,182 +1,213 @@
-import React, { useState, useEffect } from 'react';
-import './App.css'; // Make sure to import the CSS file
-
-const initialMockData = [
-  { id: 1, type: 'lost', title: 'Sony Wireless Headphones', category: 'electronics', location: 'University Library', date: '2023-10-24', desc: 'Black WH-1000XM4. Left them on a desk on the 3rd floor.', img: 'https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?auto=format&fit=crop&w=500&q=80' },
-  { id: 2, type: 'found', title: 'Car Keys with Leather Fob', category: 'keys', location: 'Downtown Coffee Shop', date: '2023-10-25', desc: 'Toyota keys found near the entrance patio.', img: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=500&q=80' },
-  { id: 3, type: 'lost', title: 'Brown Leather Wallet', category: 'documents', location: 'Subway Station', date: '2023-10-26', desc: 'Contains ID and several cards. Reward offered!', img: 'https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=500&q=80' },
-  { id: 4, type: 'found', title: 'Golden Retriever Dog', category: 'pets', location: 'Central Park', date: '2023-10-27', desc: 'Friendly dog, wearing a red collar but no tags.', img: 'https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=500&q=80' },
-];
+import React, { useState } from 'react';
+import './App.css';
 
 export default function App() {
-  const [items, setItems] = useState(initialMockData);
-  const [filteredItems, setFilteredItems] = useState(initialMockData);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [currentFilter, setCurrentFilter] = useState('all');
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // --- State Management ---
+  const [items, setItems] = useState([
+    { id: 1, type: 'lost', name: 'Car Keys with Leather Strap', location: 'Cafeteria, Table 4', date: 'Just now', icon: 'fa-key' },
+    { id: 2, type: 'found', name: 'Black Wireless Earbuds', location: 'Lecture Hall B', date: '2 hours ago', icon: 'fa-headphones' },
+    { id: 3, type: 'lost', name: 'MacBook Charger', location: 'Library, 2nd Floor', date: 'Yesterday', icon: 'fa-plug' },
+    { id: 4, type: 'found', name: 'Calculus Textbook', location: 'Main Office', date: '3 days ago', icon: 'fa-book' }
+  ]);
+
+  // UI States (Modals)
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   
-  const [formData, setFormData] = useState({
-    type: 'lost',
-    title: '',
-    category: 'electronics',
-    location: '',
-    date: '',
-    desc: ''
-  });
+  // Feature States
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  
+  // Form States
+  const [formData, setFormData] = useState({ type: 'lost', name: '', location: '' });
+  const [loginData, setLoginData] = useState({ username: '', password: '' });
 
-  // Filter Logic
-  useEffect(() => {
-    const query = searchQuery.toLowerCase();
-    const filtered = items.filter(item => {
-      const matchesSearch = item.title.toLowerCase().includes(query) || 
-                            item.location.toLowerCase().includes(query) || 
-                            item.desc.toLowerCase().includes(query);
-      
-      const matchesType = currentFilter === 'all' || 
-                          item.type === currentFilter || 
-                          item.category === currentFilter;
-      
-      return matchesSearch && matchesType;
-    });
-    setFilteredItems(filtered);
-  }, [searchQuery, currentFilter, items]);
-
-  // Handle Form Inputs
-  const handleInputChange = (e) => {
-    const { id, value } = e.target;
-    setFormData(prev => ({ ...prev, [id]: value }));
+  // --- Helper Functions ---
+  const getIcon = (name) => {
+    const lowerName = name.toLowerCase();
+    if(lowerName.includes('key')) return 'fa-key';
+    if(lowerName.includes('phone') || lowerName.includes('mobile')) return 'fa-mobile-screen';
+    if(lowerName.includes('bag')) return 'fa-bag-shopping';
+    if(lowerName.includes('book')) return 'fa-book';
+    if(lowerName.includes('card') || lowerName.includes('wallet')) return 'fa-wallet';
+    return 'fa-box'; 
   };
 
-  // Handle Form Submission
-  const handleSubmit = (e) => {
+  // --- Handlers ---
+  const handleReportClick = () => {
+    if (isAuthenticated) {
+      setIsReportModalOpen(true);
+    } else {
+      alert("Please login first to report an item!");
+      setIsLoginModalOpen(true);
+    }
+  };
+
+  // *** LOGIN SUBMIT HANDLER WITH ALERT ***
+  const handleLoginSubmit = (e) => {
     e.preventDefault();
-    const newItem = {
-      ...formData,
-      id: Date.now(),
-      img: 'https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&w=500&q=80' 
-    };
-
-    setItems(prev => [newItem, ...prev]);
-    setIsModalOpen(false);
-    setFormData({ type: 'lost', title: '', category: 'electronics', location: '', date: '', desc: '' }); // Reset form
-    setTimeout(() => alert('Successfully posted to the community!'), 100);
+    alert("Login successfully"); // <-- Alert added here
+    setIsAuthenticated(true);
+    setIsLoginModalOpen(false);
+    setLoginData({ username: '', password: '' });
   };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+  };
+
+  // *** REPORT SUBMIT HANDLER WITH ALERT ***
+  const handleReportSubmit = (e) => {
+    e.preventDefault();
+    alert("Report successfully"); // <-- Alert added here
+    
+    const newItem = {
+      id: Date.now(),
+      type: formData.type,
+      name: formData.name,
+      location: formData.location,
+      date: 'Just now',
+      icon: getIcon(formData.name)
+    };
+    
+    setItems([newItem, ...items]);
+    setIsReportModalOpen(false);
+    setFormData({ type: 'lost', name: '', location: '' });
+  };
+
+  // Filter items based on search query
+  const filteredItems = items.filter(item => 
+    item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    item.location.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
-    <>
-      {/* Navigation */}
-      <nav>
-        <div className="logo"><i className="fas fa-radar"></i> Lost & Found</div>
-        <div className="nav-actions">
-          <button onClick={() => alert('Login module would open here!')}>Sign In</button>
-          <button onClick={() => alert('Admin panel requires authentication.')}>Admin</button>
-          <button className="btn-post" onClick={() => setIsModalOpen(true)}>
-            <i className="fas fa-plus"></i> Report Item
-          </button>
-        </div>
-      </nav>
-
-      {/* Header & Search */}
-      <header>
-        <h1>Find What You Lost. <br /> Return What You Found.</h1>
-        <div className="search-container">
-          <i className="fas fa-search"></i>
-          <input 
-            type="text" 
-            placeholder="Search by item name, category, or location..." 
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
+    <div className="app-container">
+      <div className="container">
         
-        <div className="filters">
-          {['all', 'lost', 'found', 'electronics', 'keys'].map((filterType) => (
-            <button 
-              key={filterType}
-              className={`filter-btn ${currentFilter === filterType ? 'active' : ''}`} 
-              onClick={() => setCurrentFilter(filterType)}
-            >
-              {filterType.charAt(0).toUpperCase() + filterType.slice(1)} Items
-            </button>
-          ))}
-        </div>
-      </header>
-
-      {/* Main Grid */}
-      <main className="grid-container">
-        {filteredItems.length === 0 ? (
-          <h3 style={{ gridColumn: '1/-1', textAlign: 'center', color: 'var(--text-muted)', marginTop: '50px' }}>
-            No matching items found.
-          </h3>
-        ) : (
-          filteredItems.map(item => (
-            <div className="card" key={item.id}>
-              <img src={item.img} className="card-img" alt={item.title} />
-              <span className={`badge ${item.type}`}>{item.type}</span>
-              <div className="card-content">
-                <h3>{item.title}</h3>
-                <p><i className="fas fa-map-marker-alt"></i> {item.location}</p>
-                <p><i className="far fa-calendar-alt"></i> {item.date}</p>
-                <p><i className="fas fa-tag"></i> <span style={{ textTransform: 'capitalize' }}>{item.category}</span></p>
-                <p className="desc">{item.desc}</p>
-                <button className="btn-connect" onClick={() => alert('Secure messaging initiated!')}>
-                  <i className="fas fa-comment-dots"></i> Contact {item.type === 'lost' ? 'Owner' : 'Finder'}
-                </button>
-              </div>
+        {/* Navigation */}
+        <nav className="glass">
+          <div className="logo">
+            <i className="fa-solid fa-radar"></i> Echo
+          </div>
+          
+          <div className="nav-controls">
+            <div className="search-box">
+              <i className="fa-solid fa-magnifying-glass"></i>
+              <input 
+                type="text" 
+                placeholder="Search items..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
             </div>
-          ))
-        )}
-      </main>
+            
+            {isAuthenticated ? (
+              <button className="btn btn-outline" onClick={handleLogout}>
+                <i className="fa-solid fa-right-from-bracket"></i> Logout
+              </button>
+            ) : (
+              <button className="btn btn-outline" onClick={() => setIsLoginModalOpen(true)}>
+                <i className="fa-solid fa-user"></i> Login
+              </button>
+            )}
+          </div>
+        </nav>
 
-      {/* Post Item Modal */}
-      <div className={`modal-overlay ${isModalOpen ? 'active' : ''}`}>
-        <div className="modal">
+        {/* Hero Section */}
+        <section className="hero">
+          <h1>Lost it? Found it?<br/>Let's Echo it out.</h1>
+          <p>The modern, centralized hub to report missing belongings or declare items you've found across campus.</p>
+          <button className="btn btn-primary" onClick={handleReportClick}>
+            <i className="fa-solid fa-plus"></i> Report an Item
+          </button>
+        </section>
+
+        {/* Item Grid */}
+        <section className="grid">
+          {filteredItems.length > 0 ? (
+            filteredItems.map((item) => (
+              <div key={item.id} className="glass card">
+                <div className={`badge ${item.type}`}>{item.type}</div>
+                <i className={`fa-solid ${item.icon} card-icon`}></i>
+                <h3>{item.name}</h3>
+                <p><i className="fa-solid fa-location-dot"></i> {item.location}</p>
+                <p><i className="fa-regular fa-clock"></i> {item.date}</p>
+              </div>
+            ))
+          ) : (
+            <div className="no-results">
+              <i className="fa-solid fa-ghost"></i>
+              <h3>No items found</h3>
+              <p>Try adjusting your search terms.</p>
+            </div>
+          )}
+        </section>
+      </div>
+
+      {/* --- Modals --- */}
+
+      {/* 1. Login Modal */}
+      <div className={`modal-overlay ${isLoginModalOpen ? 'active' : ''}`} onClick={(e) => {
+        if(e.target.className.includes('modal-overlay')) setIsLoginModalOpen(false);
+      }}>
+        <div className="glass modal-content">
           <div className="modal-header">
-            <h2>Report an Item</h2>
-            <button className="close-btn" onClick={() => setIsModalOpen(false)}>
-              <i className="fas fa-times"></i>
+            <h2>Welcome Back</h2>
+            <button className="close-btn" onClick={() => setIsLoginModalOpen(false)}>
+              <i className="fa-solid fa-xmark"></i>
             </button>
           </div>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleLoginSubmit}>
             <div className="form-group">
-              <label htmlFor="type">Report Type</label>
-              <select id="type" value={formData.type} onChange={handleInputChange} required>
-                <option value="lost">I lost something</option>
-                <option value="found">I found something</option>
-              </select>
+              <label>Username</label>
+              <input type="text" className="form-control" placeholder="Enter any username" required 
+                value={loginData.username} onChange={(e) => setLoginData({...loginData, username: e.target.value})} />
             </div>
             <div className="form-group">
-              <label htmlFor="title">Item Name</label>
-              <input type="text" id="title" value={formData.title} onChange={handleInputChange} placeholder="e.g., MacBook Pro" required />
+              <label>Password</label>
+              <input type="password" className="form-control" placeholder="Enter any password" required 
+                value={loginData.password} onChange={(e) => setLoginData({...loginData, password: e.target.value})} />
             </div>
-            <div className="form-group">
-              <label htmlFor="category">Category</label>
-              <select id="category" value={formData.category} onChange={handleInputChange} required>
-                <option value="electronics">Electronics</option>
-                <option value="documents">Documents</option>
-                <option value="keys">Keys</option>
-                <option value="pets">Pets</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
-            <div style={{ display: 'flex', gap: '15px' }}>
-              <div className="form-group" style={{ flex: 1 }}>
-                <label htmlFor="location">Location</label>
-                <input type="text" id="location" value={formData.location} onChange={handleInputChange} placeholder="e.g., Terminal 2" required />
-              </div>
-              <div className="form-group" style={{ flex: 1 }}>
-                <label htmlFor="date">Date</label>
-                <input type="date" id="date" value={formData.date} onChange={handleInputChange} required />
-              </div>
-            </div>
-            <div className="form-group">
-              <label htmlFor="desc">Description</label>
-              <textarea id="desc" rows="3" value={formData.desc} onChange={handleInputChange} placeholder="Provide distinct features..." required></textarea>
-            </div>
-            <button type="submit" className="btn-submit">Submit Report</button>
+            <button type="submit" className="btn btn-primary submit-btn">Login</button>
           </form>
         </div>
       </div>
-    </>
+
+      {/* 2. Report Item Modal */}
+      <div className={`modal-overlay ${isReportModalOpen ? 'active' : ''}`} onClick={(e) => {
+        if(e.target.className.includes('modal-overlay')) setIsReportModalOpen(false);
+      }}>
+        <div className="glass modal-content">
+          <div className="modal-header">
+            <h2>Report Item</h2>
+            <button className="close-btn" onClick={() => setIsReportModalOpen(false)}>
+              <i className="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+          <form onSubmit={handleReportSubmit}>
+            <div className="form-group">
+              <label>Report Type</label>
+              <select className="form-control" value={formData.type} onChange={(e) => setFormData({...formData, type: e.target.value})} required>
+                <option value="lost">I Lost Something</option>
+                <option value="found">I Found Something</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Item Name</label>
+              <input type="text" className="form-control" placeholder="e.g., Blue Notebook" required 
+                value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
+            </div>
+            <div className="form-group">
+              <label>Location</label>
+              <input type="text" className="form-control" placeholder="e.g., Central Library" required 
+                value={formData.location} onChange={(e) => setFormData({...formData, location: e.target.value})} />
+            </div>
+            <button type="submit" className="btn btn-primary submit-btn">Submit Report</button>
+          </form>
+        </div>
+      </div>
+
+    </div>
   );
 }
