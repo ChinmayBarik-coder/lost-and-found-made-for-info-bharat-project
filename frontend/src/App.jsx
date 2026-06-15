@@ -88,7 +88,7 @@ export default function App() {
         {/* Navigation */}
         <nav className="glass">
           <div className="logo">
-            <i className="fa-solid fa-radar"></i> Echo
+            <i className="fa-solid fa-radar"></i> LOST & FOUND
           </div>
           
           <div className="nav-controls">
